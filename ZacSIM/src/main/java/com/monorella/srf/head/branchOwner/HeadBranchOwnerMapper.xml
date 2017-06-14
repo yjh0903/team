@@ -1,0 +1,123 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.monorella.srf.head.branchOwner.HeadBranchOwnerMapper">
+
+	<!-- 사업자 삭제시 brunch_dashboard_account_list 테이블에 해당 branch_owner_cd와 관련딘 레코드 삭제 -->
+	<delete id="deleteAccountList" parameterType="String">
+		DELETE FROM brunch_dashboard_account_list WHERE branch_owner_cd = #{branch_owner_cd};
+	</delete>
+	<!-- 사업자 등록시  brunch_dashboard_account_list insert-->
+	<select id="insertAccountList" parameterType="String">
+		INSERT INTO brunch_dashboard_account_list (branch_owner_cd, account_type)
+		VALUES (#{branch_owner_cd}, '수입'), (#{branch_owner_cd}, '지출');
+	</select>
+
+	<select id="selectPresentList" resultType="com.monorella.srf.head.dto.HeadBranchOwner">
+	SELECT 
+		branch_owner_cd	
+		,	owner_num
+		, branch_nm
+		, branch_owner_addr 
+	 	, branch_owner_detail_addr
+		, branch_owner_tel
+		, branch_tel
+		, branch_addr 
+		, branch_detail_addr 
+		FROM branch_owner_tb 
+	</select>
+	
+	<!-- 사업자 삭제시 insert_num_list 테이블에 해당 branch_owner_cd와 관련딘 레코드 삭제 -->
+	<delete id="deleteAgeGroupList" parameterType="String">
+		DELETE FROM branch_dashboard_age_group WHERE branch_owner_cd = #{branch_owner_cd};
+	</delete>
+	<!-- 사업자 등록시  branch_dashboard_age_group insert-->
+	<select id="insertAgeGroupList" parameterType="String">
+		INSERT INTO branch_dashboard_age_group (branch_owner_cd, member_sex)
+		VALUES (#{branch_owner_cd}, '남자'), (#{branch_owner_cd}, '여자');
+	</select>
+
+	<!-- 사업자 삭제시 insert_num_list 테이블에 해당 branch_owner_cd와 관련딘 레코드 삭제 -->
+	<delete id="deleteNumList" parameterType="String">
+		DELETE FROM insert_num_list WHERE branch_owner_cd = #{branch_owner_cd};
+	</delete>
+	<!-- 사업자 등록시 insert_num_list 테이블에 branch_owner_cd 및 member_sex=남자 값을 가진 레코드 생성 -->
+	<insert id="insertNumList" parameterType="String">
+		INSERT INTO insert_num_list (branch_owner_cd, member_sex)
+		VALUES (#{branch_owner_cd}, '남자'), (#{branch_owner_cd}, '여자');
+	</insert>
+	
+	<!-- 사업자 정보 삭제 -->
+	<delete id="deleteBranchOwner" parameterType="String">
+		DELETE FROM branch_owner_tb WHERE branch_owner_cd = #{branch_owner_cd};
+	</delete>
+	<!-- 사업자 정보 수정 처리 -->
+	<update id="modifyBranchOwner" parameterType="com.monorella.srf.head.dto.HeadBranchOwner">
+		UPDATE `branch_owner_tb` 
+		SET `owner_num`=#{owner_num}
+		, `owner_nm`=#{owner_nm}
+		, `branch_owner_pw`=#{branch_owner_pw}
+		, `branch_owner_postcode`=#{branch_owner_postcode}
+		, `branch_owner_addr`=#{branch_owner_addr}
+		, `branch_owner_detail_addr`=#{branch_owner_detail_addr}
+		, `branch_owner_tel`=#{branch_owner_tel}
+		, `branch_nm`=#{branch_nm}
+		, `branch_tel`=#{branch_tel}
+		, `branch_addr`=#{branch_addr}
+		, `branch_postcode`=#{branch_postcode}
+		, `branch_detail_addr`=#{branch_detail_addr}
+		WHERE  branch_owner_cd = #{branch_owner_cd};
+	</update>
+	
+	<!-- 단일 사업자 정보 조회 -->
+	<select id="selectOneBranchOwner" parameterType="String" resultType="com.monorella.srf.head.dto.HeadBranchOwner">
+		SELECT branch_owner_cd, owner_num, owner_nm, branch_owner_id, branch_owner_pw
+		, branch_owner_postcode, branch_owner_addr, branch_owner_detail_addr, branch_owner_tel
+		, branch_owner_in_date, branch_nm, branch_tel, branch_addr, branch_postcode, branch_detail_addr
+		FROM branch_owner_tb
+		WHERE branch_owner_cd = #{branch_owner_cd};
+	</select>
+	
+	<!-- 사업자 목록 -->
+	<select id="selectBranchOwnerList" parameterType="java.util.List" resultType="com.monorella.srf.head.dto.HeadBranchOwner">
+		SELECT branch_owner_cd, owner_num, owner_nm, branch_owner_tel, branch_nm, branch_tel, branch_addr, branch_detail_addr
+		FROM branch_owner_tb
+		ORDER BY owner_nm ASC;
+	</select>
+	
+	<!-- 사업자 등록 -->
+	<insert id="insertBranchOwner" parameterType="com.monorella.srf.head.dto.HeadBranchOwner">
+		INSERT INTO `branch_owner_tb` 
+		(`branch_owner_cd`
+		, `owner_num`
+		, `owner_nm`
+		, `branch_owner_id`
+		, `branch_owner_pw`
+		, `branch_owner_postcode`
+		, `branch_owner_addr`
+		, `branch_owner_detail_addr`
+		, `branch_owner_tel`
+		, `branch_owner_in_date`
+		, `branch_nm`
+		, `branch_tel`
+		, `branch_addr`
+		, `branch_postcode`
+		, `branch_detail_addr`) 
+		VALUES (
+		  #{branch_owner_cd}
+		, #{owner_num}
+		, #{owner_nm}
+		, #{branch_owner_id}
+		, #{branch_owner_pw}
+		, #{branch_owner_postcode}
+		, #{branch_owner_addr}
+		, #{branch_owner_detail_addr}
+		, #{branch_owner_tel}
+		, NOW()
+		, #{branch_nm}
+		, #{branch_tel}
+		, #{branch_addr}
+		, #{branch_postcode}
+		, #{branch_detail_addr});
+	</insert>
+
+</mapper>

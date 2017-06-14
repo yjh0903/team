@@ -1,0 +1,32 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.monorella.srf.head.dashboard.HeadDashboardMapper">
+
+<select id="selectBranch" resultType="com.monorella.srf.branch.dto.BranchOwner" >
+	SELECT 
+		branch_owner_cd
+		, branch_nm
+	FROM branch_owner_tb	
+</select>
+
+<select id="selectBranchTotalIncome" parameterType="com.monorella.srf.branch.dto.DashboardAccount" resultType="com.monorella.srf.branch.dto.DashboardAccount">
+SELECT 
+	branch_owner_cd
+	, january
+	, february
+	, march
+	, april
+	, may
+	, june
+	, july
+	, august
+	, september
+	, october
+	, november
+	, december
+	, account_type
+FROM brunch_dashboard_account_list
+WHERE account_type =#{account_type} AND branch_owner_cd = #{branch_owner_cd}
+</select>
+
+</mapper>

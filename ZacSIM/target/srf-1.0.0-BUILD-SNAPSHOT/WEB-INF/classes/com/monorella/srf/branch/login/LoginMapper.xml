@@ -1,0 +1,13 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.monorella.srf.branch.login.LoginMapper">
+	<select id="loginBranchOwner" parameterType="com.monorella.srf.branch.dto.BranchOwner" resultType="com.monorella.srf.branch.dto.BranchOwner">
+		SELECT
+		branch_owner_cd
+		, branch_owner_nm
+		, owner_nm
+		FROM branch_owner_tb
+	    WHERE branch_owner_id = #{branch_owner_id} AND branch_owner_pw = #{branch_owner_pw}
+	</select>
+</mapper>

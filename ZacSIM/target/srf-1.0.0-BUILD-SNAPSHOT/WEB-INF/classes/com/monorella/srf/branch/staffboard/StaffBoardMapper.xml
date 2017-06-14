@@ -1,0 +1,116 @@
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.monorella.srf.branch.staffboard.StaffBoardMapper">
+
+<!-- <select id="replayTotalBoard" parameterType="int" resultType="int">
+	SELECT count(*) FROM boardreply WHERE board_no = #{board_no}
+</select>
+
+<select id="totalStaffBoardReply" parameterType="int" resultType="kr.or.orange.service.Reply">
+	SELECT
+	 	re_no
+	 	, board_no
+	 	, re_user
+	 	, DATE_FORMAT(re_date, '%Y-%m-%d %h:%i:%s') re_date
+	 	, re_parent
+	 	, re_content
+	FROM boardreply WHERE board_no = #{board_no}
+</select>-->
+
+<insert id="insertStaffBoardReply" parameterType="com.monorella.srf.branch.dto.StaffBoardReply">
+	INSERT INTO branch_staffboardreply_tb(
+		staffboard_no
+		, staffboard_name
+		, staffboardreply_pw
+		, staffboardreply_date
+		, staffboardreply_content)
+		 VALUES (
+		  #{staffboard_no}
+		  , #{staffboard_name}
+		  , #{staffboardreply_pw}
+		  , NOW()
+		  , #{staffboardreply_content})
+</insert>
+
+<delete id="deleteStaffBoard" parameterType="com.monorella.srf.branch.dto.StaffBoard">
+	DELETE FROM branch_staffboard_tb 
+	WHERE staffboard_no=#{staffboard_no} 
+	AND staffboard_pw=#{staffboard_pw}
+	</delete>
+
+<update id="modifyStaffBoard" parameterType="com.monorella.srf.branch.dto.StaffBoard">
+	UPDATE branch_staffboard_tb 
+	SET staffboard_title=#{staffboard_title}
+	, staffboard_content=#{staffboard_content} 
+	WHERE staffboard_no=#{staffboard_no} 
+	AND staffboard_pw=#{staffboard_pw}
+	</update>
+
+<select id="getStaffBoard" parameterType="int" resultType="com.monorella.srf.branch.dto.StaffBoard">
+	SELECT 
+	staffboard_no 
+	, staffboard_title 
+	, staffboard_content 
+	, staff_name 
+	, staffboard_date 
+	FROM branch_staffboard_tb 
+	WHERE staffboard_no=#{staffboard_no}
+	</select>
+	
+	<select id="searchStaffBoard" parameterType="java.util.Map" resultType="com.monorella.srf.branch.dto.StaffBoard">
+	SELECT
+		staffboard_no
+		 , staffboard_title
+		 , staff_name 
+		 , staffboard_date
+		 FROM branch_staffboard_tb
+		  <if test="sv !=null and sv != ''">
+		 	<if test="so.equals('staffboard_no')">
+		WHERE staffboard_no like concat('%',#{sv},'%')
+		</if>
+		<if test="so.equals('staffboard_title')">
+			WHERE staffboard_title like concat('%',#{sv},'%')
+		</if>
+		<if test="so.equals('staff_name')">
+			WHERE staff_name like concat('%',#{sv},'%')
+		</if>
+		<if test="so.equals('staffboard_date')">
+			WHERE staffboard_date like concat('%',#{sv},'%')
+		</if>
+		</if> 
+</select>
+
+<select id="getStaffBoardList" parameterType="java.util.Map" resultType="com.monorella.srf.branch.dto.StaffBoard">
+	SELECT 
+		staffboard_no
+		, staffboard_title
+		, staff_name
+		, staffboard_date
+		FROM branch_staffboard_tb 
+		ORDER BY staffboard_no DESC 
+		LIMIT #{beginRow}, #{pagePerRow}
+	</select>
+	
+	<select id="getStaffBoardCount" resultType="int">
+		SELECT COUNT(*) FROM branch_staffboard_tb
+	</select>
+
+ <insert id="insertStaffBoard" parameterType="com.monorella.srf.branch.dto.StaffBoard">
+	INSERT INTO branch_staffboard_tb(
+		staffboard_pw
+		, staffboard_title
+		, staffboard_content
+		, staff_name
+		, staffboard_date)
+	VALUES(
+		#{staffboard_pw}
+		, #{staffboard_title}
+		, #{staffboard_content}
+		, #{staff_name}
+		, now()
+	)
+	</insert>
+
+</mapper>

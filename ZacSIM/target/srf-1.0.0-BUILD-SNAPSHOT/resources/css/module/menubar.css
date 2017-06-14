@@ -1,0 +1,9 @@
+@CHARSET "UTF-8";
+.navbar{
+	position : fixed;
+	z-index : 60;
+	width : 100%;
+}
+#sidebar, #wrap{
+	margin-top : 68px;	
+}

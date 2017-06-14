@@ -1,0 +1,10 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.monorella.srf.head.login.HeadLoginMapper">
+	<select id="LoginPro" parameterType="com.monorella.srf.head.dto.HeadManager" resultType="com.monorella.srf.head.dto.HeadManager">
+		SELECT head_manager, head_id, head_pw, head_name
+		FROM head_manager_tb
+		WHERE head_id=#{head_id}
+		AND head_pw=#{head_pw}
+	</select>
+</mapper>

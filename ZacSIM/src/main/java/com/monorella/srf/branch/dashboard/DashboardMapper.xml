@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.monorella.srf.branch.dashboard.DashboardMapper">
+	
+	
+	<!-- 회계 파트 -->
+	<!-- 월별 결제 총액 -->
+	<select id="selectMonthExpenseTotal" parameterType="String" resultType="com.monorella.srf.branch.dto.DashboardAccount">
+		SELECT january, february, march, april, may, june, july, august, september, october, november, december 
+		FROM brunch_dashboard_account_list 
+		WHERE branch_owner_cd = #{branch_owner_cd} 
+		AND account_type = '지출'
+	</select>
+	<select id="selectMonthIncomeTotal" parameterType="String" resultType="com.monorella.srf.branch.dto.DashboardAccount">
+		SELECT january, february, march, april, may, june, july, august, september, october, november, december 
+		FROM brunch_dashboard_account_list 
+		WHERE branch_owner_cd = #{branch_owner_cd} 
+		AND account_type = '수입'
+	</select>
+	<!-- 당월 지출 총액 -->
+	<select id="selectTotalExpanse" parameterType="String" resultType="int">
+		SELECT IFNULL(SUM(expense_total),0) FROM branch_expense_tb WHERE expense_month = MONTH(NOW()) AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	<!-- 당월 결제 총액 -->
+	<select id="selectTotalIncome" parameterType="String" resultType="int">
+		SELECT IFNULL(SUM(total_amount),0) FROM branch_pay_tb WHERE pay_month = MONTH(NOW()) AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	
+	
+	<!-- 여자 회원의 연령대별 수 -->
+	<select id="selectUseMemberAgeGroupWomanNum" parameterType="String" resultType="com.monorella.srf.branch.dto.DashboardAgeGroup">
+		SELECT teens, twenty, thirty, forty, etc 
+		FROM branch_dashboard_age_group 
+		WHERE branch_owner_cd = #{branch_owner_cd}
+		AND member_sex = '여자'
+	</select>
+	<!-- 남자 회원의 연령대별 수 -->
+	<select id="selectUseMemberAgeGroupMenNum" parameterType="String" resultType="com.monorella.srf.branch.dto.DashboardAgeGroup">
+		SELECT teens, twenty, thirty, forty, etc 
+		FROM branch_dashboard_age_group 
+		WHERE branch_owner_cd = #{branch_owner_cd}
+		AND member_sex = '남자'
+	</select>
+	
+	
+	<!-- 이용중 회원 목록 -->
+	<select id="selectUseMemberList" parameterType="String" resultType="com.monorella.srf.branch.dto.UsingMemberList">
+		SELECT st.seat_cd AS seat_cd
+			, mt.member_nm AS member_nm
+			, mt.member_sex AS member_sex
+			, rt.room_nm AS room_nm 
+			, (SElECT stt.seat_in_time FROM branch_seat_time_tb ORDER BY stt.seat_in_time DESC LIMIT 1) AS in_time
+		FROM branch_saet_tb st 
+		INNER JOIN branch_member_tb mt 
+		ON st.seat_cd = mt.seat_cd
+		INNER JOIN branch_room_tb rt 
+		ON st.room_cd = rt.room_cd 
+		INNER JOIN branch_seat_time_tb stt
+		ON st.seat_cd = stt.seat_cd
+		WHERE st.branch_owner_cd = #{branch_owner_cd}
+		AND st.colseat_state = '입실'
+		GROUP BY mt.member_nm
+		ORDER BY stt.seat_in_time DESC
+	</select>
+	
+	
+	<!-- 월별 가입자수 -->
+	<!-- 월별 남자 가입자수 추이 목록 -->
+	<select id="selectInsertNumWoman" parameterType="String" resultType="com.monorella.srf.branch.dto.InsertNumList">
+		SELECT january, february, march, april, may, june, july, august, september, october, november, december 
+		FROM insert_num_list 
+		WHERE branch_owner_cd = #{branch_owner_cd}
+		AND member_sex = '여자'
+	</select>
+	<!-- 월별 남자 가입자수 추이 목록 -->
+	<select id="selectInsertNumMen" parameterType="String" resultType="com.monorella.srf.branch.dto.InsertNumList">
+		SELECT january, february, march, april, may, june, july, august, september, october, november, december 
+		FROM insert_num_list 
+		WHERE branch_owner_cd = #{branch_owner_cd}
+		AND member_sex = '남자'
+	</select>
+	
+	
+	<!-- 주 이용 목적 -->
+	<!-- 토익 -->
+	<select id="selectPurposeLanguage" parameterType="String" resultType="int" >
+		SELECT COUNT(*)
+		FROM branch_member_tb
+		WHERE member_use_pur = "외국어"
+		AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	<!-- 수능 -->
+	<select id="selectPurposeCSAT" parameterType="String" resultType="int" >
+		SELECT COUNT(*)
+		FROM branch_member_tb
+		WHERE member_use_pur = "수능"
+		AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	<!-- 공무원 -->
+	<select id="selectPurposePublicOfficial" parameterType="String" resultType="int" >
+		SELECT COUNT(*)
+		FROM branch_member_tb
+		WHERE member_use_pur = "공무원"
+		AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	<!-- 자격증 -->
+	<select id="selectPurposeLicense" parameterType="String" resultType="int" >
+		SELECT COUNT(*)
+		FROM branch_member_tb
+		WHERE member_use_pur = "자격증"
+		AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	<!-- 기타 -->
+	<select id="selectPurposeEtc" parameterType="String" resultType="int" >
+		SELECT COUNT(*)
+		FROM branch_member_tb
+		WHERE member_use_pur = "기타"
+		AND branch_owner_cd = #{branch_owner_cd}
+	</select>	
+	
+	
+	<!-- 등록경로 -->
+	<!-- 전단지 -->
+	<select id="selectPamphletCount" parameterType="String" resultType="int">
+		SELECT COUNT(*) 
+		FROM branch_member_tb 
+		WHERE member_regi_path = "전단지"
+		AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	<!-- 지인소개 -->
+	<select id="selectIntroductionCount" parameterType="String" resultType="int">
+		SELECT COUNT(*) 
+		FROM branch_member_tb 
+		WHERE member_regi_path = "지인소개"
+		AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	<!-- 인터넷 -->
+	<select id="selectInternetCount" parameterType="String" resultType="int">
+		SELECT COUNT(*) 
+		FROM branch_member_tb 
+		WHERE member_regi_path = "인터넷"
+		AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	<!-- 플래카드 -->
+	<select id="selectPlacardCount" parameterType="String" resultType="int">
+		SELECT COUNT(*) 
+		FROM branch_member_tb 
+		WHERE member_regi_path = "플래카드"
+		AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	<!-- 기타 -->
+	<select id="selectEtcCount" parameterType="String" resultType="int">
+		SELECT COUNT(*) 
+		FROM branch_member_tb
+		WHERE member_regi_path = "기타"
+		AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	
+	
+	<!-- 열람석 -->
+	<!-- 미결제 열람석 -->
+	<select id="selectUnpaidSeatCount" parameterType="String" resultType="int">
+		SELECT COUNT(*) 
+		FROM branch_saet_tb 
+		WHERE colseat_state = '빈좌석'
+		AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	<!-- 부재중 열람석 -->
+	<select id="selectAbsenceSeatCount" parameterType="String" resultType="int">
+		SELECT COUNT(*) 
+		FROM branch_saet_tb 
+		WHERE colseat_state = '퇴실'
+		AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	<!-- 사용중 열람석 -->
+	<select id="selectUseSeatCount" parameterType="String" resultType="int">
+		SELECT COUNT(*) 
+		FROM branch_saet_tb 
+		WHERE colseat_state = "입실"
+		AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	
+	
+	<!-- 회원 -->
+	<!-- 당월 등록 회원 -->
+	<select id="selectMonthInsertMemberCount" parameterType="String" resultType="int">
+		SELECT COUNT(member_month) FROM branch_member_tb WHERE member_month = MONTH(CURDATE()) AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	<!-- 금일 등록 회원 -->
+	<select id="selectTodayInsertMemberCount" parameterType="String" resultType="int">
+		SELECT COUNT(*)
+		FROM branch_member_tb 
+		WHERE member_date = CURRENT_DATE()
+		AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	<!-- 여자 회원 -->
+	<select id="selectWomanCount" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM branch_member_tb WHERE member_sex = "여자" AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	<!-- 남자 회원 -->
+	<select id="selectMenCount" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM branch_member_tb WHERE member_sex = "남자" AND branch_owner_cd = #{branch_owner_cd}
+	</select>
+	<!-- 전체 회원 -->
+	<select id="selectMemberCount" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd}
+	</select>
+	
+</mapper>

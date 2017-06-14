@@ -1,0 +1,98 @@
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.monorella.srf.branch.expense.ExpenseMapper">
+
+	<!-- 결제 등록시 월별 지출 총액 업데이트 -->
+	<update id="modifyMonthExpense" parameterType="com.monorella.srf.branch.dto.DashboardAccount">
+		UPDATE brunch_dashboard_account_list 
+		SET january = #{january}
+		, february = #{february}
+		, march = #{march}
+		, april = #{april}
+		, may = #{may}
+		, june = #{june}
+		, july = #{july}
+		, august = #{august}
+		, september = #{september}
+		, october = #{october}
+		, november = #{november}
+		, december = #{december}
+		, account_type = '지출'
+		WHERE branch_owner_cd = #{branch_owner_cd}
+		AND account_type = '지출'
+	</update>
+	<!-- 지출 등록시 월별 지출 총액 셀렉트 -->
+	<select id="selectMonthExpense" parameterType="String" resultType="com.monorella.srf.branch.dto.DashboardAccount">
+		SELECT branch_owner_cd 
+		,(SELECT IFNULL(SUM(expense_total),0) FROM branch_expense_tb WHERE branch_owner_cd = #{branch_owner_cd} AND expense_month = 1) AS january
+		,(SELECT IFNULL(SUM(expense_total),0) FROM branch_expense_tb WHERE branch_owner_cd = #{branch_owner_cd} AND expense_month = 2) AS february
+		,(SELECT IFNULL(SUM(expense_total),0) FROM branch_expense_tb WHERE branch_owner_cd = #{branch_owner_cd} AND expense_month = 3) AS march
+		,(SELECT IFNULL(SUM(expense_total),0) FROM branch_expense_tb WHERE branch_owner_cd = #{branch_owner_cd} AND expense_month = 4) AS april
+		,(SELECT IFNULL(SUM(expense_total),0) FROM branch_expense_tb WHERE branch_owner_cd = #{branch_owner_cd} AND expense_month = 5) AS may
+		,(SELECT IFNULL(SUM(expense_total),0) FROM branch_expense_tb WHERE branch_owner_cd = #{branch_owner_cd} AND expense_month = 6) AS june
+		,(SELECT IFNULL(SUM(expense_total),0) FROM branch_expense_tb WHERE branch_owner_cd = #{branch_owner_cd} AND expense_month = 7) AS july
+		,(SELECT IFNULL(SUM(expense_total),0) FROM branch_expense_tb WHERE branch_owner_cd = #{branch_owner_cd} AND expense_month = 8) AS august
+		,(SELECT IFNULL(SUM(expense_total),0) FROM branch_expense_tb WHERE branch_owner_cd = #{branch_owner_cd} AND expense_month = 9) AS september
+		,(SELECT IFNULL(SUM(expense_total),0) FROM branch_expense_tb WHERE branch_owner_cd = #{branch_owner_cd} AND expense_month = 10) AS october
+		,(SELECT IFNULL(SUM(expense_total),0) FROM branch_expense_tb WHERE branch_owner_cd = #{branch_owner_cd} AND expense_month = 11) AS november
+		,(SELECT IFNULL(SUM(expense_total),0) FROM branch_expense_tb WHERE branch_owner_cd = #{branch_owner_cd} AND expense_month = 12) AS december
+		FROM branch_expense_tb
+		WHERE branch_owner_cd = #{branch_owner_cd}
+		GROUP BY branch_owner_cd
+	</select>
+<!-- 지출내역 기간별 검색 셀렉트 -->
+<select id="searchExpense" parameterType="java.util.Map" resultType="com.monorella.srf.branch.dto.Expense">
+	SELECT 
+	expense_cd
+		 , branch_owner_cd
+		 , expense_breakdown 
+		 , expense_total
+		 , branch_name
+		 , expense_date
+	FROM branch_expense_tb
+	WHERE #{searchStartDate}<![CDATA[ <=]]> expense_date AND expense_date <![CDATA[ <=]]> #{searchEndDate}
+</select>
+
+
+<!-- 지출내역 리스트 셀렉트 -->
+<select id="selectExpenseList" parameterType="java.util.Map" resultType="com.monorella.srf.branch.dto.Expense">
+	SELECT 	
+	 branch_owner_cd
+		, expense_breakdown
+		, expense_total
+		, branch_name
+		, expense_date
+		FROM branch_expense_tb 
+		WHERE branch_owner_cd = #{branch_owner_cd}
+		ORDER BY expense_date DESC 
+		LIMIT #{beginRow}, #{pagePerRow}
+	</select>
+
+	<!-- <select id="getExpenseCount" resultType="int">
+		SELECT COUNT(*) FROM branch_expense_tb
+	</select> -->
+	
+<insert id="insertExpense" parameterType="com.monorella.srf.branch.dto.Expense">
+	INSERT INTO branch_expense_tb(
+		branch_owner_cd
+		, expense_price
+		, expense_breakdown
+		, expense_amount
+		, branch_name
+		, expense_total
+		, expense_date
+		, expense_month)	
+	VALUES(
+		#{branch_owner_cd}
+		, #{expense_price}
+		, #{expense_breakdown}
+		, #{expense_amount}
+		, #{branch_name}
+		, #{expense_total}
+		, #{expense_date}
+		, DATE_FORMAT(expense_date,'%m')
+	)
+	</insert>
+</mapper>

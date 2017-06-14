@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.monorella.srf.branch.room.RoomMapper">
+  
+  	<!-- 열람실별 열람석 정보 가져오기 -->
+  	<select id="selectRoomSeat" parameterType="com.monorella.srf.branch.dto.Room" resultType="com.monorella.srf.branch.dto.Seat">
+  		SELECT
+	  		 bs.seat_cd
+	  		 ,  bs.room_cd
+	  		 ,  bs.branch_owner_cd
+	  		 ,  bs.seat_cnumber
+	  		 ,  bs.seat_appoint
+	  		 ,  bs.colseat_state
+	  		 ,  bs.seat_row
+	  		 ,  bs.seat_col
+	  		 ,  bm.member_nm
+		FROM branch_saet_tb bs LEFT JOIN branch_member_tb bm ON bs.seat_cd = bm.seat_cd 
+		WHERE room_cd = #{room_cd};
+  	</select>
+  
+  	<!-- 열람석 배치하기 -->
+	<update id="modifyRoomSeat" parameterType="com.monorella.srf.branch.dto.Seat">
+		UPDATE branch_saet_tb
+			SET
+				seat_row=#{seat_row},
+				seat_col=#{seat_col}
+		WHERE room_cd = #{room_cd} AND seat_cnumber = #{seat_cnumber}
+	</update>
+  
+  	<!-- 열람석 삭제하기 -->
+  	<delete id="deleteSeat" parameterType="String">
+  		DELETE FROM branch_saet_tb WHERE room_cd=#{room_cd}
+  	</delete>
+  	<!-- 열람실 삭제하기 -->
+  	<delete id="deleteRoom" parameterType="String">
+  		DELETE FROM branch_room_tb WHERE room_cd=#{room_cd}
+  	</delete>
+  	
+  	<!-- 열람석 정보가져오기 -->
+    <select id="selectSeat" resultType="com.monorella.srf.branch.dto.Seat">
+    	SELECT 
+    		bs.seat_cd
+    		,  bs.room_cd
+    		,  bs.branch_owner_cd
+    		,  bs.seat_cnumber
+    		,  bs.seat_appoint
+    		,  bs.colseat_state
+    		,  bm.member_nm
+    		,  bm.member_cd
+		FROM branch_saet_tb bs
+		LEFT JOIN branch_member_tb bm ON bs.seat_cd = bm.seat_cd;
+    </select>
+  
+	<!-- 열람실 정보가져오기 -->
+	<select id="selectRoom" resultType="com.monorella.srf.branch.dto.Room">
+		SELECT 
+			room_cd
+			, branch_owner_cd
+			, room_nm
+			, seat_num
+			, room_division
+		FROM branch_room_tb
+		ORDER BY room_nm ASC
+	</select>
+	
+	<!-- 열람석 등록 -->
+	<insert id="insertSeat" parameterType="com.monorella.srf.branch.dto.Seat">
+		INSERT INTO branch_saet_tb(
+			room_cd
+			, branch_owner_cd
+			, seat_cnumber
+			, colseat_state
+			, seat_appoint)
+		VALUES (
+		#{room_cd}
+		, #{branch_owner_cd}
+		, #{seat_cnumber}
+		, '빈좌석'
+		, 'N')
+	</insert>
+	
+	
+	<!-- 열람실 등록 -->
+	<insert id="insertRoom" parameterType="com.monorella.srf.branch.dto.Room">
+			<selectKey resultType="String" keyProperty="room_cd" order="BEFORE">
+				SELECT CONCAT('room_cd', MAX(CONVERT(SUBSTRING(room_cd, 8), UNSIGNED))+1) as room_cd
+				FROM branch_saet_tb
+			</selectKey>
+		INSERT INTO branch_room_tb(
+			room_cd
+			, branch_owner_cd
+			, room_nm
+			, seat_num
+			, room_division)
+		VALUES (
+			#{room_cd} 
+			, #{branch_owner_cd}
+			, #{room_nm}
+			, #{seat_num}
+			, #{room_division})	
+	</insert>
+  </mapper>

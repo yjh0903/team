@@ -1,0 +1,22 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.monorella.srf.branch.login.LoginMapper">
+	
+	<!-- 지점 직원 로그인 -->
+	<select id="loginBranchStaff" parameterType="com.monorella.srf.branch.dto.Staff" resultType="com.monorella.srf.branch.dto.StaffLogin">
+		SELECT ST.branch_owner_cd, ST.staff_name, OT.branch_nm
+		FROM branch_staff_tb ST
+		INNER JOIN branch_owner_tb OT
+		ON ST.branch_owner_cd = OT.branch_owner_cd
+		WHERE ST.staff_id = #{staff_id}
+		AND ST.staff_pw = #{staff_pw}
+	</select>
+	
+	<select id="loginBranchOwner" parameterType="com.monorella.srf.branch.dto.BranchOwner" resultType="com.monorella.srf.branch.dto.BranchOwner">
+		SELECT branch_owner_cd, branch_nm 
+		FROM branch_owner_tb
+		WHERE branch_owner_id = #{branch_owner_id} 
+		AND branch_owner_pw = #{branch_owner_pw};
+	</select>
+</mapper>

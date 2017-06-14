@@ -1,0 +1,33 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.monorella.srf.branch.payment.PaymentMapper">
+
+	<insert id="insertpayment" parameterType="com.monorella.srf.branch.dto.Payment">
+		INSERT INTO branch_pay_tb(
+			pay_cd
+			, branch_owner_cd
+			, room_cd
+			, seat_cd
+			, member_cd
+			, pay_amount
+			, discount_amount
+			, total_amount
+			)
+			<!-- , pay_date -->
+			<!-- , pay_option) -->
+		VALUES(
+			#{pay_cd}
+			, #{branch_owner_cd}
+			, #{room_cd}
+			, #{seat_cd}
+			, #{member_cd}
+			, #{pay_amount}
+			, #{discount_amount}
+			, #{total_amount}
+			<!-- , now() -->
+			<!-- , #{pay_option} -->
+
+		)
+	</insert>
+
+</mapper>

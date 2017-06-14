@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.monorella.srf.branch.member.MemberMapper">
+	<select id="newMember" resultType="String" parameterType="com.monorella.srf.branch.dto.Member">
+		SELECT count(*) FROM branch_member_tb
+		WHERE member_date = #{member_date}
+	</select>
+	
+	<delete id="removeMember" parameterType="com.monorella.srf.branch.dto.Member">
+		DELETE FROM branch_member_tb 
+		WHERE member_cd = #{member_cd} 
+		AND branch_owner_cd = #{branch_owner_cd}
+	</delete>
+	
+	<update id="modifyMember" parameterType="com.monorella.srf.branch.dto.Member">
+		UPDATE branch_member_tb 
+            SET branch_owner_cd = #{branch_owner_cd}
+            , branch_owner_cd = #{branch_owner_cd}
+            , staff_id = #{staff_id}
+            , member_sex = #{member_sex}
+            , member_tel = #{member_tel}
+            , member_addr = #{member_addr}
+            , member_age = #{member_age}
+            , member_seat_state = #{member_seat_state}
+        WHERE member_cd = #{member_cd}
+        AND member_nm = #{member_nm}
+    </update>
+
+	<select id="getMember" parameterType="String" resultType="com.monorella.srf.branch.dto.Member">
+		SELECT 
+			member_cd As member_cd
+			, branch_owner_cd AS branch_owner_cd
+			, staff_id As staff_id
+			, member_nm AS member_nm
+			, member_sex AS member_sex
+			, member_tel AS member_tel
+			, member_addr AS member_addr
+			, member_age AS member_age
+			, member_seat_state AS member_seat_state
+			FROM branch_member_tb 
+			WHERE member_cd = #{member_cd}
+	</select>
+
+	<select id="searchMember" parameterType="java.util.Map" resultType="com.monorella.srf.branch.dto.Member">
+		SELECT
+			 member_cd
+			 , member_nm AS member_nm
+			 , member_sex AS member_sex
+			 , member_tel AS member_tel
+			 , member_addr AS member_addr
+			 , member_age AS member_age
+			 , member_seat_state AS member_seat_state
+			 FROM branch_member_tb
+			  <if test="sv !=null and sv != ''">
+			<if test="so.equals('member_cd')">
+			WHERE member_cd like concat('%',#{sv},'%')
+			</if>
+			<if test="so.equals('member_nm')">
+				WHERE member_nm like concat('%',#{sv},'%')
+			</if>
+			<if test="so.equals('member_sex')">
+				WHERE member_sex like concat('%',#{sv},'%')
+			</if>
+			<if test="so.equals('member_tel')">
+				WHERE member_tel like concat('%',#{sv},'%')
+			</if>
+			<if test="so.equals('member_addr')">
+				WHERE member_addr like concat('%',#{sv},'%')
+			</if>
+			<if test="so.equals('member_age')">
+				WHERE member_age like concat('%',#{sv},'%') 
+			</if>
+			<if test="so.equals('member_seat_state')">
+				WHERE member_seat_state like concat('%',#{sv},'%')
+			</if>
+			</if> 
+	</select>	
+	
+	<select id="selectMemberList" parameterType="java.util.Map" resultType="com.monorella.srf.branch.dto.Member">
+		SELECT
+			member_cd
+			, branch_owner_cd
+			, member_nm
+			, member_sex
+			, member_tel
+			, member_addr
+			, member_age
+			, member_seat_state
+		FROM branch_member_tb
+		ORDER BY inout_num DESC
+		LIMIT #{beginRow}, #{pagePerRow}
+	</select>
+
+	<select id="selectMemberCount" resultType="int">
+        SELECT COUNT(*) FROM branch_member_tb
+    </select>
+	
+ 	 <select id="selectMemberCode" resultType="String">
+  		SELECT MAX(member_cd) FROM branch_member_tb
+  	</select>
+  	
+	<insert id="insertMember" parameterType="com.monorella.srf.branch.dto.Member">
+		INSERT INTO branch_member_tb(
+			member_cd
+			, branch_owner_cd
+			, staff_id
+			, seat_cd
+			, inout_num
+			, member_nm
+			, member_sex
+			, member_tel
+			, member_addr
+			, member_date
+			, member_regi_date
+			, member_end_date
+			, member_regi_path
+			, member_age
+			, member_seat_state)
+		VALUES(
+			#{member_cd}
+			, #{branch_owner_cd}
+			, #{staff_id}
+			, #{seat_cd}
+			, #{inout_num}
+			, #{member_nm}
+			, #{member_sex}
+			, #{member_tel}
+			, #{member_addr}
+			, now()
+			, #{member_regi_date}
+			, #{member_end_date}
+			, #{member_regi_path}
+			, #{member_age}
+			, #{member_seat_state}
+		)
+	</insert>		
+</mapper>

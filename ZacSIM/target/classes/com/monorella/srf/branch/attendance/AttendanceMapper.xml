@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.monorella.srf.branch.attendance.AttendanceMapper">
+  	
+  	
+  	<!-- 입퇴실 테이블 seat코드로 조회 -->
+  	<select id="selectSeatCd">
+  		
+  	</select>
+  	
+  	<!-- 퇴실 시간 insert -->
+	<update id="modifySeatOutTime" parameterType="com.monorella.srf.branch.dto.SeatTime">
+		UPDATE branch_seat_time_tb
+			SET
+				seat_out_time=NOW()
+			WHERE seat_time_cd = #{seat_time_cd} AND seat_date = #{seat_date}
+	</update>
+  	
+  	<!-- 입퇴실 테이블 한명의 정보 select  -->
+  	<select id="selectSeatTimeCd" parameterType="java.util.Map" resultType="com.monorella.srf.branch.dto.SeatTime">
+  		SELECT  
+  			MAX(seat_time_cd) AS seat_time_cd
+  			,  seat_cd
+  			,  member_cd
+  			,  seat_in_time
+  			,  seat_out_time
+  			,  seat_date
+  		FROM branch_seat_time_tb
+		WHERE seat_date = #{now_date} AND member_cd = #{member_cd}
+  	</select>
+  	
+  	<!-- 입퇴실 테이블 insert -->
+  	<insert id="insertSeatinTime" parameterType="com.monorella.srf.branch.dto.Member">
+  		INSERT INTO branch_seat_time_tb(
+  			seat_cd
+  			, member_cd
+  			, seat_in_time
+  			, seat_date)
+		VALUES (
+			#{seat_cd}
+			, #{member_cd}
+			, NOW()
+			, NOW())
+  	</insert>
+  	
+  	<!-- 입퇴실 수정 처리 -->
+  	<update id="modifySeatState" parameterType="java.util.Map">
+  		UPDATE branch_saet_tb
+			SET
+				colseat_state=#{seat_state}
+		WHERE seat_cd=#{seat_cd}
+  	</update>
+  	
+  	<!-- 입퇴실 여부 체크 -->
+  	<select id="selectSeatState" parameterType="com.monorella.srf.branch.dto.Member" resultType="String">
+  		SELECT
+  		 	colseat_state
+  		FROM branch_saet_tb
+  		WHERE seat_cd = #{seat_cd}
+  	</select>
+  	
+  	<!-- 출결번호 체크 -->
+  	<select id="selectInoutNum" parameterType="String" resultType="com.monorella.srf.branch.dto.Member">
+  		SELECT 
+  			member_nm
+  			, member_cd
+  			, seat_cd
+  		FROM branch_member_tb
+  		WHERE inout_num = #{inout_num} AND member_seat_state= 'Y'
+  	</select>
+  	
+  </mapper>

@@ -1,0 +1,175 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.monorella.srf.branch.payment.PaymentMapper">
+	
+	<!-- 요금제 조회 -->
+	<select id="selectCharges" parameterType="String" resultType="com.monorella.srf.branch.dto.Charges">
+		SELECT  
+			seat_charges_code
+			,  branch_owner_cd
+			,  seat_member_type
+			,  seat_charges_date
+			,  seat_charges_price
+		FROM seat_charges
+		WHERE branch_owner_cd = #{branch_owner_cd}
+		ORDER BY seat_charges_price 
+	</select>
+	
+	<!-- 결제 중복확인 -->
+	<select id="checkMember" parameterType="com.monorella.srf.branch.dto.Member" resultType="com.monorella.srf.branch.dto.Member">
+		SELECT
+		 member_seat_state
+		FROM branch_member_tb
+		WHERE member_cd = #{member_cd}
+	</select>
+	
+	<!-- 결제 등록시 월별 결제 총액 업데이트 -->
+	<update id="modifyMonthIncome" parameterType="com.monorella.srf.branch.dto.DashboardAccount">
+		UPDATE brunch_dashboard_account_list 
+		SET january = #{january}
+		, february = #{february}
+		, march = #{march}
+		, april = #{april}
+		, may = #{may}
+		, june = #{june}
+		, july = #{july}
+		, august = #{august}
+		, september = #{september}
+		, october = #{october}
+		, november = #{november}
+		, december = #{december}
+		, account_type = '수입'
+		WHERE branch_owner_cd = #{branch_owner_cd}
+		AND account_type = '수입'
+	</update>
+	<!-- 결제 등록시 월별 결제 총액 셀렉트 -->
+	<select id="selectMonthIncome" parameterType="String" resultType="com.monorella.srf.branch.dto.DashboardAccount">
+		SELECT branch_owner_cd 
+		,(SELECT IFNULL(SUM(total_amount),0) FROM branch_pay_tb WHERE branch_owner_cd = #{branch_owner_cd} AND pay_month = 1) AS january
+		,(SELECT IFNULL(SUM(total_amount),0) FROM branch_pay_tb WHERE branch_owner_cd = #{branch_owner_cd} AND pay_month = 2) AS february
+		,(SELECT IFNULL(SUM(total_amount),0) FROM branch_pay_tb WHERE branch_owner_cd = #{branch_owner_cd} AND pay_month = 3) AS march
+		,(SELECT IFNULL(SUM(total_amount),0) FROM branch_pay_tb WHERE branch_owner_cd = #{branch_owner_cd} AND pay_month = 4) AS april
+		,(SELECT IFNULL(SUM(total_amount),0) FROM branch_pay_tb WHERE branch_owner_cd = #{branch_owner_cd} AND pay_month = 5) AS may
+		,(SELECT IFNULL(SUM(total_amount),0) FROM branch_pay_tb WHERE branch_owner_cd = #{branch_owner_cd} AND pay_month = 6) AS june
+		,(SELECT IFNULL(SUM(total_amount),0) FROM branch_pay_tb WHERE branch_owner_cd = #{branch_owner_cd} AND pay_month = 7) AS july
+		,(SELECT IFNULL(SUM(total_amount),0) FROM branch_pay_tb WHERE branch_owner_cd = #{branch_owner_cd} AND pay_month = 8) AS august
+		,(SELECT IFNULL(SUM(total_amount),0) FROM branch_pay_tb WHERE branch_owner_cd = #{branch_owner_cd} AND pay_month = 9) AS september
+		,(SELECT IFNULL(SUM(total_amount),0) FROM branch_pay_tb WHERE branch_owner_cd = #{branch_owner_cd} AND pay_month = 10) AS october
+		,(SELECT IFNULL(SUM(total_amount),0) FROM branch_pay_tb WHERE branch_owner_cd = #{branch_owner_cd} AND pay_month = 11) AS november
+		,(SELECT IFNULL(SUM(total_amount),0) FROM branch_pay_tb WHERE branch_owner_cd = #{branch_owner_cd} AND pay_month = 12) AS december
+		FROM branch_pay_tb
+		WHERE branch_owner_cd = #{branch_owner_cd}
+		GROUP BY branch_owner_cd
+	</select>
+	
+	
+	<!-- 연장 결제 입력 -->
+	
+	
+	<!-- 기간 연장 성공시 member테이블 member_end_date 수정  -->
+	<update id="modifyEndDate" parameterType="com.monorella.srf.branch.dto.Payment">
+		UPDATE branch_member_tb
+			SET
+				member_end_date=#{member_end_date}
+			WHERE member_cd = #{member_cd}
+	</update>
+		
+	<!-- 결제 입력 -->
+	<insert id="insertPayment" parameterType="com.monorella.srf.branch.dto.Payment">
+		INSERT INTO branch_pay_tb(
+ 			branch_owner_cd
+			, room_cd
+			, seat_cd
+			, member_cd
+			, total_amount
+			, pay_date
+			, pay_month
+			, pay_option
+			, pay_extension)
+		VALUES(
+ 			#{branch_owner_cd}
+			, #{room_cd}
+			, #{seat_cd}
+			, #{member_cd}
+			, #{total_amount}
+			, now()
+			, month(now()) 
+			, #{pay_option}
+			, #{pay_extension})
+	</insert>
+	<!-- 결제 성공시 seat_appoint 수정 -->
+	<update id="modifyPaymentSeat" parameterType="com.monorella.srf.branch.dto.Payment">
+		UPDATE branch_saet_tb 
+            SET 
+            seat_appoint = 'Y'
+            , colseat_state = '배치'
+        WHERE seat_cd = #{seat_cd}
+    </update>
+    
+    <!-- 결제 성공시 member tb 수정 -->
+    <update id="modifyPaymentMember" parameterType="com.monorella.srf.branch.dto.Payment">
+		UPDATE branch_member_tb 
+            SET 
+            seat_cd = #{seat_cd}
+            , member_regi_date = #{member_regi_date}
+            , member_end_date = #{member_end_date}
+            , member_seat_state = 'Y'
+        WHERE member_cd = #{member_cd}
+    </update>
+    
+    <select id="paycddetail" parameterType="com.monorella.srf.branch.dto.Payment" resultType="int">
+		SELECT 
+			pay_cd 
+			FROM branch_pay_tb 
+			WHERE seat_cd = #{seat_cd}
+	</select>
+	
+	<!-- 출결번호 입력 -->
+    <insert id="insertPaymentinout" parameterType="com.monorella.srf.branch.dto.Payment">
+		INSERT INTO branch_inout_tb(
+ 			member_cd
+			, seat_cd
+			, pay_cd
+			)
+			VALUES(
+ 			#{member_cd}
+			, #{seat_cd}
+			, #{pay_cd}
+		)
+    </insert>
+    
+    <!-- 출결번호 조회 -->
+    <select id="inoutingdetail" parameterType="com.monorella.srf.branch.dto.Payment" resultType="int">
+		SELECT 
+			inout_num 
+			FROM branch_inout_tb 
+			WHERE member_cd = #{member_cd} AND seat_cd = #{seat_cd}
+	</select>
+	
+	<!-- 출결번호 member tb에 수정 -->
+    <update id="Paymentinoutup" parameterType="com.monorella.srf.branch.dto.Member">
+		UPDATE branch_member_tb 
+            SET 
+            inout_num = #{inout_num}
+        WHERE member_cd = #{member_cd}
+    </update>
+    
+    <!-- 상세정보 조회 -->
+	<select id="detailMember" parameterType="com.monorella.srf.branch.dto.Member" resultType="com.monorella.srf.branch.dto.Member">
+		SELECT 
+			bm.member_cd 
+			, bm.branch_owner_cd
+			, bm.seat_cd 
+			, bm.member_nm
+			, bm.member_tel
+			, bm.member_addr
+			, bm.member_age 
+			, bm.member_regi_date
+			, bm.member_end_date
+			, bs.room_cd
+			FROM branch_member_tb  bm
+			INNER JOIN branch_saet_tb bs ON bm.seat_cd = bs.seat_cd
+			WHERE bm.member_nm = #{member_nm} AND bm.seat_cd = #{seat_cd}
+	</select>
+    
+</mapper>

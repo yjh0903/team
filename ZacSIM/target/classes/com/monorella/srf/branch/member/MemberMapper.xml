@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.monorella.srf.branch.member.MemberMapper">
+	
+	<!-- ================================================================ -->
+	<!-- 회원 가입시 연령대별 남자 이용자 업데이트 -->
+	<update id="modifyWomanAgeGroupInfo" parameterType="com.monorella.srf.branch.dto.DashboardAgeGroup">
+		UPDATE branch_dashboard_age_group 
+		SET teens = #{teens}
+		, twenty = #{twenty}
+		, thirty = #{thirty}
+		, forty = #{forty}
+		, etc = #{etc}
+		WHERE branch_owner_cd = #{branch_owner_cd} AND member_sex='여자';
+	</update>
+	<!-- 회원 가입시 연령대별 남자 이용자 업데이트 -->
+	<update id="modifyMenAgeGroupInfo" parameterType="com.monorella.srf.branch.dto.DashboardAgeGroup">
+		UPDATE branch_dashboard_age_group 
+		SET teens = #{teens}
+		, twenty = #{twenty}
+		, thirty = #{thirty}
+		, forty = #{forty}
+		, etc = #{etc}
+		WHERE branch_owner_cd = #{branch_owner_cd} AND member_sex='남자';
+	</update>
+	<!-- 회원 가입시 연령대별 여자 이용자 조회 -->
+	<select id="selectAgeGroupWoman" parameterType="String" resultType="com.monorella.srf.branch.dto.DashboardAgeGroup">
+		<![CDATA[
+		SELECT branch_owner_cd
+		,
+		(SELECT COUNT(*) 
+		FROM branch_member_tb
+		WHERE member_age >= 10 
+		AND member_age < 20
+		AND member_sex = '여자'
+		AND branch_owner_cd = #{branch_owner_cd}) AS teens
+		,
+		(SELECT COUNT(*) 
+		FROM branch_member_tb
+		WHERE member_age >= 20 
+		AND member_age < 30
+		AND member_sex = '여자'
+		AND branch_owner_cd = #{branch_owner_cd}) AS twenty
+		,
+		(SELECT COUNT(*) 
+		FROM branch_member_tb
+		WHERE member_age >= 30 
+		AND member_age < 40
+		AND member_sex = '여자'
+		AND branch_owner_cd = #{branch_owner_cd}) AS thirty
+		,
+		(SELECT COUNT(*) 
+		FROM branch_member_tb
+		WHERE member_age >= 40 
+		AND member_age < 50
+		AND member_sex = '여자'
+		AND branch_owner_cd = #{branch_owner_cd}) AS forty
+		,
+		(SELECT COUNT(*) 
+		FROM branch_member_tb
+		WHERE ((member_age >= 50) OR (member_age < 10))
+		AND member_sex = '여자'
+		AND branch_owner_cd = #{branch_owner_cd}) AS etc
+		,
+		member_sex
+		FROM branch_member_tb
+		WHERE member_sex = '여자'
+		AND branch_owner_cd = #{branch_owner_cd}
+		GROUP BY branch_owner_cd
+		]]>
+	</select>
+	<!-- 회원 가입시 연령대별 남자 이용자 조회 -->
+	<select id="selectAgeGroupMen" parameterType="String" resultType="com.monorella.srf.branch.dto.DashboardAgeGroup">
+		<![CDATA[
+		SELECT branch_owner_cd
+		,
+		(SELECT COUNT(*) 
+		FROM branch_member_tb
+		WHERE member_age >= 10 
+		AND member_age < 20
+		AND member_sex = '남자'
+		AND branch_owner_cd = 'M1') AS teens
+		,
+		(SELECT COUNT(*) 
+		FROM branch_member_tb
+		WHERE member_age >= 20 
+		AND member_age < 30
+		AND member_sex = '남자'
+		AND branch_owner_cd = #{branch_owner_cd}) AS twenty
+		,
+		(SELECT COUNT(*) 
+		FROM branch_member_tb
+		WHERE member_age >= 30 
+		AND member_age < 40
+		AND member_sex = '남자'
+		AND branch_owner_cd = #{branch_owner_cd}) AS thirty
+		,
+		(SELECT COUNT(*) 
+		FROM branch_member_tb
+		WHERE member_age >= 40 
+		AND member_age < 50
+		AND member_sex = '남자'
+		AND branch_owner_cd = #{branch_owner_cd}) AS forty
+		,
+		(SELECT COUNT(*) 
+		FROM branch_member_tb
+		WHERE ((member_age >= 50) OR (member_age < 10))
+		AND member_sex = '남자'
+		AND branch_owner_cd = #{branch_owner_cd}) AS etc
+		,
+		member_sex
+		FROM branch_member_tb
+		WHERE member_sex = '남자'
+		AND branch_owner_cd = #{branch_owner_cd}
+		GROUP BY branch_owner_cd
+		]]>
+	</select>
+	<!-- ================================================================ -->
+	
+	<!-- ================================================================ -->
+	<!-- 회원 가입시 월별 여자 가입자수 업데이트 -->
+	<update id="modifyMonthInsertInfoWoman" parameterType="com.monorella.srf.branch.dto.InsertNumList">
+		UPDATE insert_num_list 
+		SET january = #{january}
+		, february = #{february}
+		, march = #{march}
+		, april = #{april}
+		, may = #{may}
+		, june = #{june}
+		, july = #{july}
+		, august = #{august}
+		, september = #{september}
+		, october = #{october}
+		, november = #{november}
+		, december = #{december}
+		 WHERE branch_owner_cd = #{branch_owner_cd} AND member_sex='여자';
+	</update>
+	<!-- 회원 가입시 월별 남자 가입자수 업데이트 -->
+	<update id="modifyMonthInsertInfoMen" parameterType="com.monorella.srf.branch.dto.InsertNumList">
+		UPDATE insert_num_list 
+		SET january = #{january}
+		, february = #{february}
+		, march = #{march}
+		, april = #{april}
+		, may = #{may}
+		, june = #{june}
+		, july = #{july}
+		, august = #{august}
+		, september = #{september}
+		, october = #{october}
+		, november = #{november}
+		, december = #{december}
+		 WHERE branch_owner_cd = #{branch_owner_cd} AND member_sex='남자';
+	</update>
+	<!-- 월별 여자 가입자수 조회 -->
+	<select id="selectMonthInsertNumWoman" parameterType="String" resultType="com.monorella.srf.branch.dto.InsertNumList">
+		SELECT 
+		branch_owner_cd
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 1 AND member_sex="여자") AS january
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 2 AND member_sex="여자") AS february
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 3 AND member_sex="여자") AS march
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 4 AND member_sex="여자") AS april
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 5 AND member_sex="여자") AS may
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 6 AND member_sex="여자") AS june
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 7 AND member_sex="여자") AS july
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 8 AND member_sex="여자") AS august
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 9 AND member_sex="여자") AS september
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 10 AND member_sex="여자") AS october
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 11 AND member_sex="여자") AS november
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 12 AND member_sex="여자") AS december
+		FROM branch_member_tb
+		WHERE branch_owner_cd = #{branch_owner_cd}
+		GROUP BY branch_owner_cd;
+	</select>
+	<!-- 월별 남자 가입자수 조회 -->
+	<select id="selectMonthInsertNumMen" parameterType="String" resultType="com.monorella.srf.branch.dto.InsertNumList">
+		SELECT 
+		branch_owner_cd
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 1 AND member_sex="남자") AS january
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 2 AND member_sex="남자") AS february
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 3 AND member_sex="남자") AS march
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 4 AND member_sex="남자") AS april
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 5 AND member_sex="남자") AS may
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 6 AND member_sex="남자") AS june
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 7 AND member_sex="남자") AS july
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 8 AND member_sex="남자") AS august
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 9 AND member_sex="남자") AS september
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 10 AND member_sex="남자") AS october
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 11 AND member_sex="남자") AS november
+		,(SELECT COUNT(member_month) FROM branch_member_tb WHERE branch_owner_cd = #{branch_owner_cd} AND member_month = 12 AND member_sex="남자") AS december
+		FROM branch_member_tb
+		WHERE branch_owner_cd = #{branch_owner_cd}
+		GROUP BY branch_owner_cd;
+	</select>
+	<!-- ================================================================ -->
+	
+	<!-- 회원 삭제 -->
+	<delete id="MemberRemove" parameterType="com.monorella.srf.branch.dto.Member">
+		DELETE FROM branch_member_tb
+		WHERE member_cd = #{member_cd}
+		AND branch_owner_cd = #{branch_owner_cd}
+	</delete>
+	
+	<!-- 회원 수정 -->
+	<update id="modifyMember" parameterType="com.monorella.srf.branch.dto.Member">
+		UPDATE branch_member_tb 
+            SET branch_owner_cd = #{branch_owner_cd}
+            , member_cd = #{member_cd}
+            , branch_owner_cd = #{branch_owner_cd}
+            , member_nm = #{member_nm}
+            , member_sex = #{member_sex}
+            , member_tel = #{member_tel}
+            , member_addr = #{member_addr}
+            , member_age = #{member_age}
+            , member_regi_path = #{member_regi_path}
+            , member_use_pur = #{member_use_pur}
+        WHERE member_nm = #{member_nm}
+        AND member_cd = #{member_cd}
+    </update>
+	
+	<!-- 하나의 입퇴실 보기 -->
+	<select id="getExit" parameterType="String" resultType="com.monorella.srf.branch.dto.SeatTime">
+		SELECT
+			m.member_nm 
+			, s.seat_date 
+			, s.seat_in_time
+			, s.seat_out_time 
+			FROM branch_member_tb AS m
+			INNER join branch_seat_time_tb AS s
+			ON m.member_cd = s.member_cd
+			WHERE m.member_nm = #{member_nm}
+	</select>	
+	
+	<!-- 하나의 회원 보기 -->
+	<select id="getMember" parameterType="String" resultType="com.monorella.srf.branch.dto.Member">
+		SELECT 
+			member_cd
+			, inout_num
+			, member_nm
+			, member_sex
+			, member_age
+			, member_regi_date
+			, member_end_date
+			, member_seat_state
+			, member_regi_path
+			, member_use_pur
+			FROM branch_member_tb 
+			WHERE member_nm = #{member_nm}
+	</select>
+
+	<!-- 입퇴실 검색 -->
+	<!-- <select id="exelist" parameterType="java.util.Map" resultType="com.monorella.srf.branch.dto.SeatTime">
+		SELECT
+		 m.member_nm
+			, s.seat_date
+			, s.seat_in_time
+			, s.seat_out_time
+			FROM branch_member_tb AS m
+			INNER join branch_seat_time_tb AS s
+			ON m.seat_cd = s.seat_cd;
+			<if test="sv !=null and sv != ''">
+			<if test="so.equals('m.member_nm')">
+				WHERE m.member_nm like concat('%',#{sv},'%')
+			</if>
+			<if test="so.equals('s.seat_date')">
+				WHERE s.seat_date like concat('%',#{sv},'%')
+			</if>
+			<if test="so.equals('s.seat_in_time')">
+				WHERE s.seat_in_time like concat('%',#{sv},'%')
+			</if>
+			<if test="so.equals('s.seat_out_time')">
+				WHERE s.seat_out_time like concat('%',#{sv},'%')
+			</if>
+			</if> 
+	</select> -->
+
+	 <!-- 입퇴실 검색 -->
+	 <select id="exeMember" parameterType="java.util.Map" resultType="com.monorella.srf.branch.dto.Member">
+		SELECT
+			 member_tel
+			 , branch_owner_cd
+			 , member_nm
+			 FROM branch_member_tb
+			  <if test="sv !=null and sv != ''">
+			<if test="so.equals('member_tel')">
+			WHERE member_tel like concat('%',#{sv},'%')
+			</if>
+			<if test="so.equals('member_nm')">
+				WHERE member_nm like concat('%',#{sv},'%')
+			</if>
+			</if> 
+	</select>
+  
+	<!-- 회원 검색 -->
+	<select id="searchMember" parameterType="java.util.Map" resultType="com.monorella.srf.branch.dto.Member">
+		SELECT
+			 member_cd
+			 , branch_owner_cd
+			 , member_nm
+			 , member_tel
+			 , member_addr
+			 , member_seat_state
+			 , member_tel
+			 , member_age
+			 , member_date
+			 FROM branch_member_tb
+			 WHERE branch_owner_cd = #{branch_owner_cd}
+			 AND
+			  <if test="sv !=null and sv != ''">
+			<if test="so.equals('member_cd')">
+			 member_cd like concat('%',#{sv},'%')
+			</if>
+			<if test="so.equals('member_nm')">
+				 member_nm like concat('%',#{sv},'%')
+			</if>
+			<if test="so.equals('member_tel')">
+				member_tel like concat('%',#{sv},'%')
+			</if>
+			<if test="so.equals('member_addr')">
+				 member_addr like concat('%',#{sv},'%')
+			</if>
+			<if test="so.equals('member_seat_state')">
+				member_seat_state like concat('%',#{sv},'%') 
+			</if>
+			<if test="so.equals('member_date')">
+				member_date like concat('%',#{sv},'%')
+			</if>
+			</if> 
+	</select>
+	<!-- 독서실 회원 목록? -->
+	<select id="getMeberView"  resultType="com.monorella.srf.branch.dto.Member">
+	SELECT 
+	member_tel
+	, member_nm 
+	FROM branch_member_tb 
+	WHERE member_tel=#{member_tel}
+	</select>
+
+	<!-- 입퇴실 내역 -->
+	<select id="exitList" parameterType="java.util.Map" resultType="com.monorella.srf.branch.dto.SeatTime">
+		SELECT
+			m.member_nm
+			, s.seat_date
+			, s.seat_in_time
+			, s.seat_out_time
+		FROM branch_member_tb AS m
+		INNER join branch_seat_time_tb AS s
+		ON m.member_cd = s.member_cd
+		WHERE m.branch_owner_cd = #{branch_owner_cd}
+		ORDER BY seat_time_cd  DESC
+	</select>
+
+	<!-- 입퇴실 회원 리스트 -->	
+	<select id="selectMemberExit" parameterType="java.util.Map" resultType="com.monorella.srf.branch.dto.Member">
+		SELECT
+			member_tel
+			, branch_owner_cd
+			, member_nm
+		FROM branch_member_tb
+		WHERE branch_owner_cd = #{branch_owner_cd}
+		ORDER BY inout_num DESC
+		LIMIT #{beginRow}, #{pagePerRow}
+	</select>
+
+	<!-- 회원 리스트 -->	
+	<select id="selectMemberList" parameterType="java.util.Map" resultType="com.monorella.srf.branch.dto.Member">
+		SELECT
+			member_cd
+			, branch_owner_cd
+			, member_nm
+			, member_tel
+			, member_addr
+			, member_seat_state
+			, member_date
+		FROM branch_member_tb
+		WHERE branch_owner_cd = #{branch_owner_cd}
+		ORDER BY inout_num DESC
+		LIMIT #{beginRow}, #{pagePerRow}
+	</select>
+
+	<!-- 입퇴실 조회 -->
+	<select id="exitMember" resultType="com.monorella.srf.branch.dto.Member">
+	  	SELECT
+		  	 member_cd
+		  	 , branch_owner_cd
+		  	 , staff_id
+		  	 , member_nm
+		  	 , member_sex
+		  	 , member_tel
+		  	 , member_addr
+		  	 , member_date
+			 , member_regi_date
+			 , member_end_date
+		  	 , member_regi_path
+		  	 , member_age
+		  	 , member_seat_state
+	  	FROM branch_member_tb
+	  	ORDER BY member_cd DESC
+  </select>
+
+	<!-- 회원 조회 -->
+	<select id="selectMember" resultType="com.monorella.srf.branch.dto.Member">
+	  	SELECT
+		  	 member_nm
+		  	 , branch_owner_cd
+		  	 , staff_id
+		  	 , member_cd
+		  	 , member_sex
+		  	 , member_tel
+		  	 , member_addr
+		  	 , member_date
+			 , member_regi_date
+			 , member_end_date
+		  	 , member_regi_path
+		  	 , member_age
+		  	 , member_seat_state
+	  	FROM branch_member_tb
+	  	ORDER BY member_cd DESC 
+  </select>
+
+	<select id="exitMemberCount" resultType="int">
+        SELECT COUNT(*) FROM branch_member_tb
+    </select>
+
+	<select id="selectMemberCount" resultType="int">
+        SELECT COUNT(*) FROM branch_member_tb
+    </select>
+
+ 	<!--  자동등록 -->
+  	<insert id="autoMemberCode" parameterType="com.monorella.srf.branch.dto.Member">
+  		<selectKey resultType="String" keyProperty="member_cd" order="BEFORE">
+  			SELECT CONCAT('member_cd', MAX(CONVERT(SUBSTRING(member_cd, 10), UNSIGNED))+1) AS member_cd
+  			FROM branch_member_tb 
+  		</selectKey>
+  		INSERT INTO branch_member_tb(
+  			member_cd
+			, branch_owner_cd
+			, staff_id
+			, seat_cd
+			, inout_num
+			, member_nm
+			, member_sex
+			, member_tel
+			, member_addr
+			, member_age
+			, member_date
+			, member_month
+			, member_regi_date
+			, member_end_date
+			, member_regi_path
+			, member_use_pur)
+		VALUES(
+			#{member_cd}
+			, #{branch_owner_cd}
+			, #{staff_id}
+			, #{seat_cd}
+			, #{inout_num}
+			, #{member_nm}
+			, #{member_sex}
+			, #{member_tel}
+			, #{member_addr}
+			, #{member_age}
+			, now()
+			, month(now())
+			, now()
+			, now()
+			, #{member_regi_path}
+			, #{member_use_pur}
+		)
+  	</insert>
+
+ 	<!-- 입퇴실 코드 COUNT -->
+ 	<select id="exitMemberCode" resultType="int">
+  		SELECT COUNT(member_cd) FROM branch_member_tb
+  	</select>  	
+ 	
+ 	<!-- 회원 코드 COUNT -->
+ 	<select id="selectMemberCode" resultType="int">
+  		SELECT COUNT(member_cd) FROM branch_member_tb
+  	</select>
+  	
+  	<!-- 회원 등록 -->
+	<insert id="insertMember" parameterType="com.monorella.srf.branch.dto.Member">
+		INSERT INTO branch_member_tb(
+  			member_cd
+			, branch_owner_cd
+			, staff_id
+			, seat_cd
+			, inout_num
+			, member_nm
+			, member_sex
+			, member_tel
+			, member_addr
+			, member_age
+			, member_date
+			, member_month
+			, member_regi_date
+			, member_end_date
+			, member_seat_state
+			, member_regi_path
+			, member_use_pur)
+		VALUES(
+			#{member_cd}
+			, #{branch_owner_cd}
+			, #{staff_id}
+			, #{seat_cd}
+			, #{inout_num}
+			, #{member_nm}
+			, #{member_sex}
+			, #{member_tel}
+			, #{member_addr}
+			, #{member_age}
+			, now()
+			, month(now())
+			, now()
+			, now()
+			, #{member_seat_state}
+			, #{member_regi_path}
+			, #{member_use_pur}
+		)
+	</insert>		
+</mapper>
